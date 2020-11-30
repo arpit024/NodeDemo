@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express();
 const Users = require('./models/Users');
+const Joi = require('@hapi/joi')
+const _ = require('lodash');
 
 let verifyEmail = async(req, res, next)=>{
     let result = await Users.findOne({
@@ -15,8 +17,39 @@ let verifyEmail = async(req, res, next)=>{
     }
     next()
 }
-router.post('/addUser',verifyEmail, async (req, res) => {
+
+let validateReqBody = (req, res, next)=>{
+    const { body } = req; 
+    const addUser = Joi.object().keys({ 
+        age: Joi.number().required(),
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required(),
+        email:Joi.string().email().required(),
+    }); 
+    const result = Joi.validate(body, addUser); 
+    const { value, error } = result; 
+    const valid = error == null; 
+    if (!valid) { 
+        const JoiError = {
+            status: 'failed',
+            error: {
+                original: result.error._original,
+
+                // fetch only message and type from each error
+                details: _.map(result.error.details, ({message, type}) => ({
+                    message: message.replace(/['"]/g, ''),
+                    type
+                }))
+            }
+        };
+        return res.status(422).json(JoiError);
+    }else{
+        next()
+    }
+}
+router.post('/addUser',validateReqBody,verifyEmail, async (req, res) => {
     try {
+
         let data = {
             FirstName: req.body.firstName,
             LastName: req.body.lastName,
