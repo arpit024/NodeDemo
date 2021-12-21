@@ -5,6 +5,8 @@ CREATE TABLE Users (
     FirstName varchar(255) NOT NULL,
     LastName varchar(255),
     Email varchar(255) unique NOT NULL,
+    HashedEmail varchar(255) NOT NULL,
+    Password varchar(255) NOT NULL,
     Age int,
     PRIMARY KEY (ID)
 );

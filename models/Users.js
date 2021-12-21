@@ -19,8 +19,14 @@ const User = db.define('Users', {
         type: Sequelize.STRING,
         uniqueKey: true
     },
+    HashedEmail: {
+        type: Sequelize.STRING
+    },
     Age: {
         type: Sequelize.INTEGER
+    },
+    Password: {
+        type: Sequelize.STRING
     }
 },{
     timestamps: false
